@@ -1,7 +1,19 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
-import { Html5Qrcode } from 'html5-qrcode'
+import { Html5Qrcode, Html5QrcodeSupportedFormats } from 'html5-qrcode'
 
 const ELEMENT_ID = 'barcode-scanner-viewport'
+
+const BARCODE_FORMATS = [
+  Html5QrcodeSupportedFormats.QR_CODE,
+  Html5QrcodeSupportedFormats.EAN_13,
+  Html5QrcodeSupportedFormats.EAN_8,
+  Html5QrcodeSupportedFormats.UPC_A,
+  Html5QrcodeSupportedFormats.UPC_E,
+  Html5QrcodeSupportedFormats.CODE_128,
+  Html5QrcodeSupportedFormats.CODE_39,
+  Html5QrcodeSupportedFormats.CODABAR,
+  Html5QrcodeSupportedFormats.ITF,
+]
 
 interface ScannerProps {
   onScan: (code: string) => void
@@ -28,11 +40,24 @@ export default function Scanner({ onScan }: ScannerProps) {
   async function startScanning() {
     setError('')
     try {
-      const scanner = new Html5Qrcode(ELEMENT_ID, { verbose: false })
+      const scanner = new Html5Qrcode(ELEMENT_ID, {
+        verbose: false,
+        formatsToSupport: BARCODE_FORMATS,
+        useBarCodeDetectorIfSupported: true,
+      })
       scannerRef.current = scanner
       await scanner.start(
         { facingMode: 'environment' },
-        { fps: 10, qrbox: { width: 260, height: 160 } },
+        {
+          fps: 10,
+          qrbox: { width: 280, height: 140 },
+          aspectRatio: 1.777,
+          videoConstraints: {
+            facingMode: 'environment',
+            width: { ideal: 1920 },
+            height: { ideal: 1080 },
+          },
+        },
         (decodedText) => {
           onScan(decodedText.trim())
           stopScanning()

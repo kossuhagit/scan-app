@@ -36,4 +36,10 @@ export default [
       '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
     },
   },
+  {
+    files: ['vite.config.ts'],
+    languageOptions: {
+      globals: { process: 'readonly' },
+    },
+  },
 ]
